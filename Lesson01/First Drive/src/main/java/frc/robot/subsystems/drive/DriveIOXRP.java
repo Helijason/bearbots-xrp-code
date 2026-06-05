@@ -49,6 +49,9 @@ public class DriveIOXRP implements DriveIO {
     inputs.leftPositionMeters = m_leftEncoder.getDistance();
     inputs.rightPositionMeters = m_rightEncoder.getDistance();
 
+    inputs.leftVelocityMetersPerSec = m_leftEncoder.getRate() * 0.0254;
+    inputs.rightVelocityMetersPerSec = m_rightEncoder.getRate() * 0.0254;
+
     inputs.accelX = m_accelerometer.getX();
     inputs.accelY = m_accelerometer.getY();
     inputs.accelZ = m_accelerometer.getZ();
