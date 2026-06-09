@@ -21,9 +21,9 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends LoggedRobot {
-  private Command m_autonomousCommand;
+  private Command autonomousCommand;
 
-  private final RobotContainer m_robotContainer;
+  private final RobotContainer robotContainer;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -36,7 +36,7 @@ public class Robot extends LoggedRobot {
     Logger.addDataReceiver(new NT4Publisher());
     Logger.start();
 
-    m_robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
   }
 
   /**
@@ -68,15 +68,16 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     Logger.recordOutput("RobotMode/AutonomousInitTimestamp", Timer.getFPGATimestamp());
 
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(m_autonomousCommand);
-      Logger.recordOutput("Qutonomous/CommandScheduled", true);
-      Logger.recordOutput("Autonomous/CommandName", m_autonomousCommand.getName());
+    if (autonomousCommand != null) {
+      CommandScheduler.getInstance().schedule(autonomousCommand);
+      // Log the autonomous command - whether we have one, and what its name is if it exists
+      Logger.recordOutput("Autonomous/CommandScheduled", true);
+      Logger.recordOutput("Autonomous/CommandName", autonomousCommand.getName());
     } else {
-      Logger.recordOutput("Qutonomous/CommandScheduled", false);
+      Logger.recordOutput("Autonomous/CommandScheduled", false);
       Logger.recordOutput("Autonomous/CommandName", "None");
     }
   }
@@ -91,8 +92,8 @@ public class Robot extends LoggedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
   }
 
