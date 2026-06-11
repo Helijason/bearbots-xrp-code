@@ -17,7 +17,7 @@ public class Arm extends SubsystemBase {
   private final LoggedMechanism2d mechanism = new LoggedMechanism2d(3, 3);
   private final LoggedMechanismRoot2d root = mechanism.getRoot("ArmPivot", 1.2, 0.18);
   private final LoggedMechanismLigament2d armLigament =
-  root.append(new LoggedMechanismLigament2d("Arm", Units.feetToMeters(3), 0));
+      root.append(new LoggedMechanismLigament2d("Arm", Units.feetToMeters(3), 0));
 
   /** Creates a new Arm. */
   public Arm(ArmIO io) {
