@@ -17,8 +17,7 @@ public class Drive extends SubsystemBase {
   private final DriveIO io;
   private final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
 
-  private final DifferentialDriveOdometry odometry =
-      new DifferentialDriveOdometry(new Rotation2d(), 0.0, 0.0);
+  private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(new Rotation2d(), 0.0, 0.0);
 
   /** Creates a new Drive subsystem. */
   public Drive(DriveIO io) {
@@ -42,31 +41,34 @@ public class Drive extends SubsystemBase {
   /**
    * Drives the robot using arcade controls.
    *
-   * @param xaxisSpeed Forward/backward speed as a percent [-1.0, 1.0]. Positive = forward.
+   * @param xaxisSpeed  Forward/backward speed as a percent [-1.0, 1.0]. Positive
+   *                    = forward.
    * @param zaxisRotate Rotation speed as a percent [-1.0, 1.0]. Positive = left.
    */
   public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
     // Clamp inputs to valid range.
+    // Clamping ensures any value above or below some certain number gets "clamped"
+    // to that number, so it stays within some range.
     xaxisSpeed = MathUtil.clamp(xaxisSpeed, -1.0, 1.0);
     zaxisRotate = MathUtil.clamp(zaxisRotate, -1.0, 1.0);
- 
+
     // Arcade IK: convert forward/rotation percent to left/right percent.
     double leftPercent = xaxisSpeed + zaxisRotate;
     double rightPercent = xaxisSpeed - zaxisRotate;
- 
+
     // Scale to volts and send to IO layer.
     io.setVoltage(leftPercent * kMaxBatteryVoltage, rightPercent * kMaxBatteryVoltage);
- 
+
     Logger.recordOutput("Drive/Commanded/XAxisSpeed", 0.0);
     Logger.recordOutput("Drive/Commanded/ZAxisRotate", 0.0);
   }
 
-   /** Stops the drive motors. */
+  /** Stops the drive motors. */
   public void stop() {
     io.stop();
 
-    Logger.recordOutput("Drive/Commanded/XaxisSpeed", 0.0);
-    Logger.recordOutput("Drive/Commanded/ZaxisRotate", 0.0);
+    Logger.recordOutput("Drive/Commanded/XAxisSpeed", 0.0);
+    Logger.recordOutput("Drive/Commanded/ZAxisRotate", 0.0);
   }
 
   /** Resets both drive encoders to zero. */
@@ -78,7 +80,7 @@ public class Drive extends SubsystemBase {
   public Pose2d getPose() {
     return odometry.getPoseMeters();
   }
- 
+
   /**
    * Resets odometry to the given pose.
    *
@@ -98,17 +100,17 @@ public class Drive extends SubsystemBase {
     return inputs.leftEncoderCount;
   }
 
-/** Returns the right encoder count in raw pulses. */
+  /** Returns the right encoder count in raw pulses. */
   public int getRightEncoderCount() {
     return inputs.rightEncoderCount;
   }
 
-   /** Returns the left wheel position in meters. */
+  /** Returns the left wheel position in meters. */
   public double getLeftPositionMeters() {
     return inputs.leftPositionMeters;
   }
 
-   /** Returns the right wheel position in meters. */
+  /** Returns the right wheel position in meters. */
   public double getRightPositionMeters() {
     return inputs.rightPositionMeters;
   }
@@ -123,7 +125,7 @@ public class Drive extends SubsystemBase {
     return inputs.accelX;
   }
 
-   /** Returns Y-axis acceleration in Gs. */
+  /** Returns Y-axis acceleration in Gs. */
   public double getAccelY() {
     return inputs.accelY;
   }
