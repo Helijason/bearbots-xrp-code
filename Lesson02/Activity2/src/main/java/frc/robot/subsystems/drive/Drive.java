@@ -18,8 +18,8 @@ public class Drive extends SubsystemBase {
   private final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
 
   private final DifferentialDriveOdometry odometry = 
-      new DifferentialDriveOdometry(new Rotation2d(), 0.0, 0.0,
-          new Pose2d(0.5, 0.5, new Rotation2d()));
+    new DifferentialDriveOdometry(new Rotation2d(), 0.0, 0.0,
+        new Pose2d(0.5, 0.5, new Rotation2d()));
 
   /** Creates a new Drive subsystem. */
   public Drive(DriveIO io) {
@@ -51,7 +51,7 @@ public class Drive extends SubsystemBase {
     // Clamp inputs to valid range.
     // Clamping ensures any value above or below some certain number gets "clamped"
     // to that number, so it stays within some range.
-    xaxisSpeed = MathUtil.clamp(xaxisSpeed, -1.0, 1.0);
+    xaxisSpeed = MathUtil.clamp(xaxisSpeed, -1.0, 1.0) * 0.8; // limit to 80% speed
     zaxisRotate = MathUtil.clamp(zaxisRotate, -1.0, 1.0);
 
     // Arcade IK: convert forward/rotation percent to left/right percent.

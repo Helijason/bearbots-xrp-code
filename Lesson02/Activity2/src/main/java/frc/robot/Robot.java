@@ -4,10 +4,6 @@
 
 package frc.robot;
 
-//import edu.wpi.first.math.geometry.Pose2d;
-//import edu.wpi.first.math.geometry.Pose3d;
-//import edu.wpi.first.math.geometry.Rotation3d;
-//import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -32,7 +28,7 @@ public class Robot extends LoggedRobot {
   public Robot() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    Logger.recordMetadata("ProjectName", "First Drive");
+    Logger.recordMetadata("ProjectName", "Activity2");
     Logger.addDataReceiver(new NT4Publisher());
     Logger.start();
 
