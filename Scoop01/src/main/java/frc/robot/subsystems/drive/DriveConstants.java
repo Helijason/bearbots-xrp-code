@@ -9,8 +9,6 @@ public final class DriveConstants {
  
   public static final double kGearRatio =
       (30.0 / 14.0) * (28.0 / 16.0) * (36.0 / 9.0) * (26.0 / 8.0); // 48.75:1
-
-  public static final double kPowerLimiting = 0.8;
  
   public static final double kCountsPerMotorShaftRev = 12.0;
  
@@ -21,8 +19,10 @@ public final class DriveConstants {
  
   public static final double kWheelRadiusMeters = kWheelDiameterMeters / 2.0;
  
+  public static final double kWheelCircumferenceMeters = Math.PI * kWheelDiameterMeters;
+ 
   public static final double kEncoderDistancePerPulseMeters =
-      0.1885 / kCountsPerWheelRevolution; // wheel circumference in meters / kCountsPerWheelRevolution
+      kWheelCircumferenceMeters / kCountsPerWheelRevolution;
  
   /** Distance between left and right wheels (track width). */
   public static final double kTrackWidthMeters = 0.155;
