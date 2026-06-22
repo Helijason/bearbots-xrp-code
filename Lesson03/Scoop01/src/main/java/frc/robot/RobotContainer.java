@@ -12,9 +12,8 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArcadeDrive;
-import frc.robot.commands.AutonomousDriveStraight;
-import frc.robot.commands.AutonomousSpin;
-import frc.robot.commands.AutonomousPattern;
+import frc.robot.commands.AutonomousDistance;
+import frc.robot.commands.AutonomousTime;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.arm.ArmIO;
@@ -93,9 +92,8 @@ public class RobotContainer {
   }
  
   private void configureAutonomous() {
-    autonomousChooser.setDefaultOption("Pattern 1", new AutonomousDriveStraight(drive));
-    autonomousChooser.addOption("Pattern 2", new AutonomousSpin(drive));
-    autonomousChooser.addOption("Pattern 3", new AutonomousPattern(drive));
+    autonomousChooser.setDefaultOption("Auto Routine Distance", new AutonomousDistance(drive));
+    autonomousChooser.addOption("Auto Routine Time", new AutonomousTime(drive));
     SmartDashboard.putData(autonomousChooser);
   }
  

@@ -78,20 +78,6 @@ public class Drive extends SubsystemBase {
     io.resetEncoders();
   }
 
-  /**
-   * Resets encoders and re-seeds odometry at the current pose.
-   * Use this between autonomous legs so odometry stays continuous.
-   */
-  public void resetEncodersKeepPose() {
-    Pose2d currentPose = odometry.getPoseMeters();
-    io.resetEncoders();
-    odometry.resetPosition(
-        Rotation2d.fromDegrees(-inputs.gyroAngleZDeg),
-        0.0,
-        0.0,
-        currentPose);
-  }
-
   /** Returns the current estimated pose of the robot. */
   public Pose2d getPose() {
     return odometry.getPoseMeters();
