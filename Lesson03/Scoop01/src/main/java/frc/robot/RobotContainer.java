@@ -10,10 +10,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArcadeDrive;
-import frc.robot.commands.AutonomousDistance;
-import frc.robot.commands.AutonomousTime;
+import frc.robot.commands.AutonomousDriveStraight;
+import frc.robot.commands.AutonomousSpin;
+import frc.robot.commands.AutonomousPattern;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.arm.ArmIO;
@@ -23,6 +25,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOXRP;
+import frc.robot.subsystems.scoop.Scoop;
  
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,6 +38,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Arm arm;
+  private final Scoop scoop;
   private final XRPOnBoardIO onboardIO = new XRPOnBoardIO();
  
   // Controller
@@ -60,6 +64,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIO() {});
         break;
     }
+    scoop = new Scoop();  // ← add this - no IO yet, same in every mode (Lesson 04 changes this)
 
     configureButtonBindings();
     configureAutonomous();
@@ -89,11 +94,21 @@ public class RobotContainer {
     new JoystickButton(controller, XboxController.Button.kB.value)
         .onTrue(Commands.runOnce(() -> arm.setAngle(ArmConstants.kHighAngleDeg), arm))
         .onFalse(Commands.runOnce(() -> arm.stop(), arm));
+    
+    // ← add this - D-pad controls the scoop
+    new POVButton(controller, 90)  // 6
+        .onTrue(scoop.setGoalCommand(Scoop.Goal.FLAT));
+    new POVButton(controller, 0)   // 8
+        .onTrue(scoop.setGoalCommand(Scoop.Goal.CARRY));
+    new POVButton(controller, 180) // 2
+        .onTrue(scoop.setGoalCommand(Scoop.Goal.DUMP));
+        
   }
  
   private void configureAutonomous() {
-    autonomousChooser.setDefaultOption("Auto Routine Distance", new AutonomousDistance(drive));
-    autonomousChooser.addOption("Auto Routine Time", new AutonomousTime(drive));
+    autonomousChooser.setDefaultOption("Pattern 1", new AutonomousDriveStraight(drive));
+    autonomousChooser.addOption("Pattern 2", new AutonomousSpin(drive));
+    autonomousChooser.addOption("Pattern 3", new AutonomousPattern(drive));
     SmartDashboard.putData(autonomousChooser);
   }
  
