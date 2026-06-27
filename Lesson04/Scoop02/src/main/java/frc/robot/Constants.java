@@ -3,7 +3,6 @@
 // the MIT License available in the root directory of this project.
 
 package frc.robot;
- 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -27,14 +26,10 @@ public final class Constants {
    * <p>Change this to REAL before deploying to the XRP.
    * Change to SIM to run the simulator on your laptop.
    */
-  public static final RobotMode currentMode = RobotMode.SIM;
-  //public static final RobotMode currentMode = RobotMode.REAL;
- 
-  public enum RobotMode {
-    REAL,
-    SIM,
-    REPLAY
-  }
+  public enum Mode { REAL, SIM, REPLAY }
+  public static final Mode currentMode = Mode.SIM;          // SIM = live XRP; set REPLAY to replay a log
+  //public static final Mode simMode = Mode.REAL;          // SIM = live XRP; set REPLAY to replay a log
+  //public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
  
   /**
    * Nominal battery voltage for the XRP robot (4x AA alkaline batteries).

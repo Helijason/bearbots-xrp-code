@@ -1,5 +1,6 @@
 package frc.robot.subsystems.arm;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
@@ -48,9 +49,10 @@ public class Arm extends SubsystemBase {
    * @param angleDeg desired arm angle in degrees
    */
   public void setAngle(double angleDeg) {
-    io.setAngle(angleDeg);
-
-    Logger.recordOutput("Arm/Commanded/AngleDeg", angleDeg);
+      double clamped = MathUtil.clamp(
+          angleDeg, ArmConstants.kMinAngleDeg, ArmConstants.kMaxAngleDeg);
+      io.setAngle(clamped);
+      Logger.recordOutput("Arm/Commanded/AngleDeg", clamped);
   }
 
   /** Move the arm to its safe/stowed position. */

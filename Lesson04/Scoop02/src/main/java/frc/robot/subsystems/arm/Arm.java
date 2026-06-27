@@ -24,6 +24,8 @@ public class Arm extends SubsystemBase {
   private final LoggedMechanismLigament2d armLigament =
       root.append(new LoggedMechanismLigament2d("Arm", Units.feetToMeters(3), 0));
 
+  private Pose3d componentPose = new Pose3d();
+
   /** Creates a new Arm. */
   public Arm(ArmIO io) {
     this.io = io;
@@ -37,14 +39,8 @@ public class Arm extends SubsystemBase {
     // Update 2D visualization
     armLigament.setAngle(180 - inputs.commandedAngleDeg);
     Logger.recordOutput("Arm/Mechanism2d", mechanism);
-    Logger.recordOutput(
-      "FinalComponentPoses",
-      new Pose3d[] {
-        new Pose3d(-0.052, 0.007, 0.0645,
-            new Rotation3d(0.0, Math.toRadians(inputs.commandedAngleDeg), 0.0))
-            //new Rotation3d(0.0, Math.toRadians(0.0), 0.0))
-      });
-    
+    componentPose = new Pose3d(-0.052, 0.007, 0.0645,
+        new Rotation3d(0.0, Math.toRadians(inputs.commandedAngleDeg), 0.0));
   } 
 
   /**
@@ -66,5 +62,10 @@ public class Arm extends SubsystemBase {
 
   public double getCommandedAngleDeg() {
     return inputs.commandedAngleDeg;
+  }
+
+  /** Returns the current 3D pose of the arm for AdvantageScope aggregation. */
+  public Pose3d getComponentPose() {
+    return componentPose;
   }
 }

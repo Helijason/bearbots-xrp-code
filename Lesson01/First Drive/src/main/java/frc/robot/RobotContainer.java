@@ -4,12 +4,12 @@ import static frc.robot.Constants.OperatorConstants.*;
  
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.xrp.XRPOnBoardIO;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.AutonomousDriveStraight;
@@ -24,6 +24,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOXRP;
+import frc.robot.subsystems.scoop.Scoop;
  
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,13 +37,14 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Arm arm;
+  private final Scoop scoop;
   private final XRPOnBoardIO onboardIO = new XRPOnBoardIO();
  
   // Controller
   private final XboxController controller = new XboxController(kDriverControllerPort);
  
   // Autonomous chooser
-  private final SendableChooser<Command> autonomousChooser = new SendableChooser<>();
+private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDashboardChooser<>("Auto Choices");
  
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -61,6 +63,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIO() {});
         break;
     }
+    scoop = new Scoop();  // ← add this - no IO yet, same in every mode (Lesson 04 changes this)
 
     configureButtonBindings();
     configureAutonomous();
@@ -90,13 +93,21 @@ public class RobotContainer {
     new JoystickButton(controller, XboxController.Button.kB.value)
         .onTrue(Commands.runOnce(() -> arm.setAngle(ArmConstants.kHighAngleDeg), arm))
         .onFalse(Commands.runOnce(() -> arm.stop(), arm));
+    
+    // ← add this - D-pad controls the scoop
+    new POVButton(controller, 90)  // 6
+        .onTrue(scoop.setGoalCommand(Scoop.Goal.FLAT));
+    new POVButton(controller, 0)   // 8
+        .onTrue(scoop.setGoalCommand(Scoop.Goal.CARRY));
+    new POVButton(controller, 180) // 2
+        .onTrue(scoop.setGoalCommand(Scoop.Goal.DUMP));
+
   }
  
   private void configureAutonomous() {
-    autonomousChooser.setDefaultOption("Pattern 1", new AutonomousDriveStraight(drive));
+    autonomousChooser.addDefaultOption("Pattern 1", new AutonomousDriveStraight(drive));
     autonomousChooser.addOption("Pattern 2", new AutonomousSpin(drive));
     autonomousChooser.addOption("Pattern 3", new AutonomousPattern(drive));
-    SmartDashboard.putData(autonomousChooser);
   }
  
   /**
@@ -105,6 +116,6 @@ public class RobotContainer {
    * @return the selected autonomous command
    */
   public Command getAutonomousCommand() {
-    return autonomousChooser.getSelected();
+    return autonomousChooser.get();
   }
 }

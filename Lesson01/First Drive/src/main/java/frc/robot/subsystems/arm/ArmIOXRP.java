@@ -1,6 +1,5 @@
 package frc.robot.subsystems.arm;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.xrp.XRPServo;
 import static frc.robot.Constants.ArmHardware.*;
 
@@ -17,12 +16,7 @@ public class ArmIOXRP implements ArmIO {
 
   @Override
   public void setAngle(double angleDeg) {
-    commandedAngleDeg =
-        MathUtil.clamp(
-            angleDeg,
-            ArmConstants.kMinAngleDeg,
-            ArmConstants.kMaxAngleDeg);
-
-    armServo.setAngle(commandedAngleDeg);
+      commandedAngleDeg = angleDeg;
+      armServo.setAngle(commandedAngleDeg);
   }
 }

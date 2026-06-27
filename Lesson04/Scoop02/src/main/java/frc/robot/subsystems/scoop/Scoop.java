@@ -8,6 +8,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 public class Scoop extends SubsystemBase {
     public enum Goal {
@@ -19,6 +24,13 @@ public class Scoop extends SubsystemBase {
     private final ScoopIO io;
     private final ScoopIOInputsAutoLogged inputs = new ScoopIOInputsAutoLogged();
     private Goal goal = Goal.FLAT;
+
+  // Mechanism2d: vertical column on the front of the robot
+  private final LoggedMechanism2d mechanism = new LoggedMechanism2d(2, 2);
+  private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", 1.0, 0.1);
+  private final LoggedMechanismLigament2d scoopLigament =
+      root.append(new LoggedMechanismLigament2d("Scoop", 0.15, 90));
+  private Pose3d componentPose = new Pose3d();
 
   public Scoop(ScoopIO io) {
     this.io = io;
@@ -54,5 +66,16 @@ public class Scoop extends SubsystemBase {
 
       io.setAngle(clamped);
       Logger.recordOutput("Scoop/Goal", goal.toString());
+
+    // 90° = FLAT (up), 45° = CARRY, 0° = DUMP (forward)
+    scoopLigament.setAngle(inputs.commandedAngleDeg);
+    Logger.recordOutput("Scoop/Mechanism2d", mechanism);
+    componentPose = new Pose3d(0.0, 0.0, 0.0,
+        new Rotation3d(0.0, Math.toRadians(inputs.commandedAngleDeg), 0.0));
+  }
+
+  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */
+  public Pose3d getComponentPose() {
+    return componentPose;
   }
 }

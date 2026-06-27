@@ -4,16 +4,19 @@
 
 package frc.robot;
 
-//import edu.wpi.first.math.geometry.Pose2d;
-//import edu.wpi.first.math.geometry.Pose3d;
-//import edu.wpi.first.math.geometry.Rotation3d;
-//import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import edu.wpi.first.math.geometry.Pose3d;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -30,12 +33,38 @@ public class Robot extends LoggedRobot {
    * initialization code.
    */
   public Robot() {
+    Logger.recordMetadata("ProjectName", "First Drive");
+    switch (Constants.currentMode) {
+      case REAL: // Real hardware
+        Logger.addDataReceiver(new WPILOGWriter("logs/"));
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+      case SIM: // Simulated code
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+      case REPLAY:
+        String logPath = System.getenv("AKIT_LOG_PATH");
+        if (logPath == null || logPath.isBlank()) {
+          JFileChooser chooser = new JFileChooser(new File("logs/"));
+          chooser.setDialogTitle("Select a Log File for Replay");
+          chooser.setFileFilter(new FileNameExtensionFilter("WPILOG Files", "wpilog"));
+          if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            logPath = chooser.getSelectedFile().getAbsolutePath();
+          } else {
+            throw new RuntimeException("Replay cancelled: No log file was selected.");
+          }
+        }
+        setUseTiming(false);
+        Logger.setReplaySource(new WPILOGReader(logPath));
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
+    }
+    Logger.start();
+    
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    Logger.recordMetadata("ProjectName", "First Drive");
-    Logger.addDataReceiver(new NT4Publisher());
-    Logger.start();
-
+    
     robotContainer = new RobotContainer();
   }
 
@@ -54,6 +83,11 @@ public class Robot extends LoggedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
+    // Aggregate all component poses for AdvantageScope 3D view.
+    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {
+      robotContainer.getArm().getComponentPose(),
+      robotContainer.getScoop().getComponentPose()
+    });
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
