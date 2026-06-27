@@ -16,6 +16,7 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import edu.wpi.first.math.geometry.Pose3d;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -42,23 +43,19 @@ public class Robot extends LoggedRobot {
         Logger.addDataReceiver(new WPILOGWriter());
         Logger.addDataReceiver(new NT4Publisher());
         break;
-      case REPLAY: // Log replay
-        // Replaying a log, set up replay source
-        String logPath = "";
-        // Create file explorer popup centered on your project's logs folder
-        JFileChooser chooser = new JFileChooser(new File("logs/"));
-        chooser.setDialogTitle("Select a Log File for Replay");
-        chooser.setFileFilter(new FileNameExtensionFilter("WPILOG Files", "wpilog"));
-
-        int returnValue = chooser.showOpenDialog(null);
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
+      case REPLAY:
+        String logPath = System.getenv("AKIT_LOG_PATH");
+        if (logPath == null || logPath.isBlank()) {
+          JFileChooser chooser = new JFileChooser(new File("logs/"));
+          chooser.setDialogTitle("Select a Log File for Replay");
+          chooser.setFileFilter(new FileNameExtensionFilter("WPILOG Files", "wpilog"));
+          if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             logPath = chooser.getSelectedFile().getAbsolutePath();
-        } else {
-            // Fallback crash preventative if user exits out of window without choosing
+          } else {
             throw new RuntimeException("Replay cancelled: No log file was selected.");
+          }
         }
-
-        setUseTiming(false); // Run as fast as possible
+        setUseTiming(false);
         Logger.setReplaySource(new WPILOGReader(logPath));
         Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
         break;
@@ -86,6 +83,10 @@ public class Robot extends LoggedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
+    // Aggregate all component poses for AdvantageScope 3D view.
+    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {
+      robotContainer.getArm().getComponentPose()
+    });
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

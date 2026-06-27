@@ -3,9 +3,19 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2026.2.1"
 }
 
+// ─── MANUAL MODE SWITCH ───────────────────────────
+enum RobotMode { SIM, XRP, REPLAY }
+def ROBOT_MODE = RobotMode.SIM
+// ──────────────────────────────────────────────────
+
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+task(replayWatch, type: JavaExec) {
+    mainClass = "org.littletonrobotics.junction.ReplayWatch"
+    classpath = sourceSets.main.runtimeClasspath
 }
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
@@ -42,13 +52,24 @@ test {
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
 }
 
-// Simulation configuration (e.g. environment variables).
-wpi.sim.addGui().defaultEnabled = true
-wpi.sim.addDriverstation()
+// replay.ps1 passes -PakitLogPath; env var is a fallback. Either forces REPLAY.
+def replayPath = project.findProperty("akitLogPath") ?: System.getenv("AKIT_LOG_PATH")
+def effectiveMode = (replayPath != null && replayPath != "") ? RobotMode.REPLAY : ROBOT_MODE
 
-//Sets the XRP Client Host
-wpi.sim.envVar("HALSIMXRP_HOST", "192.168.1.69")
-wpi.sim.addXRPClient().defaultEnabled = true
+// Simulation configuration.
+switch (effectiveMode) {
+    case RobotMode.REPLAY:
+        wpi.sim.addGui().defaultEnabled = false
+        wpi.sim.addXRPClient().defaultEnabled = false
+        break
+    case RobotMode.XRP:
+        wpi.sim.envVar("HALSIMXRP_HOST", "192.168.1.69")
+        wpi.sim.addXRPClient().defaultEnabled = true
+        wpi.sim.addGui().defaultEnabled = true
+        break
+    default: // SIM
+        wpi.sim.addGui().defaultEnabled = true
+}
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib

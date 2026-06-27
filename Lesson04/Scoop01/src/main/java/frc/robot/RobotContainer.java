@@ -67,8 +67,8 @@ private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDash
         arm = new Arm(new ArmIO() {});
         break;
     }
-    scoop = new Scoop();  // ← add this - no IO yet, same in every mode (Lesson 04 changes this)
-
+    scoop = new Scoop();
+    
     configureButtonBindings();
     configureAutonomous();
   }
@@ -98,7 +98,7 @@ private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDash
         .onTrue(Commands.runOnce(() -> arm.setAngle(ArmConstants.kHighAngleDeg), arm))
         .onFalse(Commands.runOnce(() -> arm.stop(), arm));
     
-    // ← add this - D-pad controls the scoop
+    // add this - D-pad controls the scoop
     new POVButton(controller, 90)  // 6
         .onTrue(scoop.setGoalCommand(Scoop.Goal.FLAT));
     new POVButton(controller, 0)   // 8
@@ -121,5 +121,13 @@ private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDash
    */
   public Command getAutonomousCommand() {
     return autonomousChooser.get();
+  }
+
+  public frc.robot.subsystems.arm.Arm getArm() {
+    return arm;
+  }
+
+  public frc.robot.subsystems.scoop.Scoop getScoop() {
+    return scoop;
   }
 }

@@ -12,33 +12,33 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Scoop extends SubsystemBase {
     public enum Goal {
-        FLAT,   // servo at 0° - resting position
-        CARRY,  // servo at 45° - holding game piece
-        DUMP    // servo at 90° - releasing game piece
+        FLAT,   // resting position
+        CARRY,  // holding game piece
+        DUMP    // releasing game piece
     }
 
   private final XRPServo scoopServo = new XRPServo(4);
   
   @AutoLogOutput
-  private Goal goal = Goal.FLAT; // ← add this field - start flat
+  private Goal goal = Goal.FLAT; // start flat
   
   /** Creates a new Scoop. */
   public Scoop() {
     // Constructor - runs once at startup
   }
 
-  // ← add this method - simple setter, changes the goal field
+  // simple setter, changes the goal field
   public void setGoal(Goal newGoal) {
     goal = newGoal;
   }
 
-  // ← add this method - returns a command that sets the goal once, then ends
+  // returns a command that sets the goal once, then ends
   // runOnce() = run the lambda once, then the command is done
   public Command setGoalCommand(Goal newGoal) {
     return runOnce(() -> setGoal(newGoal));
   }
 
-  // ← add this method - safe state, called when a command is interrupted
+  // safe state, called when a command is interrupted
   public void stop() {
     setGoal(Goal.FLAT);  // return to resting position
   }
