@@ -6,6 +6,8 @@ plugins {
 // ─── MANUAL MODE SWITCH ───────────────────────────
 enum RobotMode { SIM, REAL, REPLAY }
 def ROBOT_MODE = RobotMode.SIM
+//def ROBOT_MODE = RobotMode.REAL
+//def ROBOT_MODE = RobotMode.REPLAY
 // ──────────────────────────────────────────────────
 
 java {
